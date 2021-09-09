@@ -11,19 +11,21 @@ contract IPO is PostDeliveryCrowdsale, AllowanceCrowdsale, CappedCrowdsale{
     
     
     mapping(address => uint256) private _contributions;
-    uint public _individualCap;
+    uint public individualCap;
+    uint public individualFloor;
     
     constructor (uint startTime, uint stopTime) public 
-        Crowdsale(100, 0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB, IERC20(0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8)) 
-        CappedCrowdsale(170 ether) 
-        AllowanceCrowdsale(0x5B38Da6a701c568545dCfcB03FcB875f56beddC4) 
+        Crowdsale(50, 0x43833a52813ae6BdCfeaf7deb46351cE00c740F7, IERC20(0xB2d7b35539A543bbE4c74965488fFE33c6721f0d)) 
+        CappedCrowdsale(360 ether) 
+        AllowanceCrowdsale(0xDC7eDEE4d0A8dc5F38CA1590c6e9Dd9c049D79a6) 
         TimedCrowdsale(startTime, stopTime) 
         PostDeliveryCrowdsale() {
-        _individualCap = 1000000000000000000;
+        individualCap = 2 ether;
+        individualFloor = 0.2 ether;
     }
     
     function getIndividualContribution() public view returns(uint256){
-        return _individualCap;
+        return individualCap;
     }
     
     /**
@@ -43,9 +45,9 @@ contract IPO is PostDeliveryCrowdsale, AllowanceCrowdsale, CappedCrowdsale{
     function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
         super._preValidatePurchase(beneficiary, weiAmount);
         // solhint-disable-next-line max-line-length
-        require(weiAmount >= 0.1 ether, "IPO: weiAmount less than minimum contribution");
+        require(weiAmount >= individualFloor, "IPO: weiAmount less than minimum contribution");
         uint contribution = _contributions[beneficiary].add(weiAmount);
-        require(contribution <= _individualCap, "IPO: beneficiary's cap exceeded");
+        require(contribution <= individualCap, "IPO: beneficiary's cap exceeded");
     }
     
     function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal {
