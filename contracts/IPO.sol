@@ -54,4 +54,9 @@ contract IPO is PostDeliveryCrowdsale, AllowanceCrowdsale, CappedCrowdsale{
         super._updatePurchasingState(beneficiary, weiAmount);
         _contributions[beneficiary] = _contributions[beneficiary].add(weiAmount);
     }
+    
+    function extendTime(uint256 newClosingTime) external {
+        require(msg.sender == wallet());
+        super._extendTime(newClosingTime);
+    }
 }
